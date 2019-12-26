@@ -1,2 +1,2 @@
-# Baekjoon_Algoritm
-algorithm solution of Baekjoon
+# AlgorithmSolution
+algorithm solution of Baekjoon, Programmers, etc..
