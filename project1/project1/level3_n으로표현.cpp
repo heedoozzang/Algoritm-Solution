@@ -1,65 +1,60 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <set>
 
 using namespace std;
 
-vector<int> list;
-int cnt = 0;
-int minCount = 0;
+int get_basic_number(int N, int cnt) {
+	int res = 0;
 
-void BFS(int N, int number) {
-	if (cnt >= minCount) return;
-	if (list.size() >= minCount) return;
-	int lastNumber = (list.size() == 0) ? 0 : list.back();
-
-	if (lastNumber == number) {
-		minCount = min(cnt, minCount);
-		return;
+	while (cnt > 0) {
+		cnt -= 1;
+		res += N * pow(10, cnt);
+		cout << res << ' ';
 	}
 
-	int n = 0;
-	int addCount = 0;
-
-	for (int i = 1; i < 10000000; i *= 10) {
-		addCount++;
-		if (cnt + addCount >= minCount) continue;
-
-		n += (N * i);
-
-		cnt += addCount;
-
-		list.push_back(lastNumber + n);
-		BFS(N, number);
-		list.pop_back();
-		
-		if (lastNumber - n != 0) {
-			list.push_back(lastNumber - n);
-			BFS(N, number);
-			list.pop_back();
-		}
-
-		list.push_back(lastNumber * n);
-		BFS(N, number);
-		list.pop_back();
-
-		if (lastNumber / n != 0) {
-			list.push_back(lastNumber / n);
-			BFS(N, number);
-			list.pop_back();
-		}
-
-		cnt -= addCount;
-	}
-	return;
+	return res;
 }
 
 int solution(int N, int number) {
-	BFS(N, number);
+	int answer = -1;
 
-	return minCount < 9 ? minCount : -1;
+	const int MIN = 8;
+
+	auto s = vector<set<int>>(MIN);
+
+	int idx = 1;
+
+	for (auto & x : s) {
+		x.insert(get_basic_number(N, idx));
+		idx += 1;
+	}
+
+	for (int i = 1; i < MIN; i++) {
+		for (int j = 0; j < i; j++) {
+			for (const auto & op1 : s[j]) {
+				for (const auto & op2 : s[i - j - 1]) {
+					s[i].insert(op1 + op2);
+					s[i].insert(op1 - op2);
+					s[i].insert(op1 * op2);
+
+					if (op2 != 0)
+						s[i].insert(op1 / op2);
+				}
+			}
+		}
+		if (s[i].find(number) != s[i].end()) {
+			answer = i + 1;
+			break;
+		}
+	}
+	return answer;
 }
 
 int main() {
+	int N, number, result;
 
+	result = solution(5, 12);
+	cout << result;
 }
